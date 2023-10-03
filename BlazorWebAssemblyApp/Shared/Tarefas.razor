@@ -1,0 +1,78 @@
+﻿@inject HttpClient http
+
+@if (tarefas == null)
+{
+    <Alerta Mensagem="Carregando..." />
+    @*<p>Carregando as tarefas...</p>*@
+}
+else if (!tarefas.Any())
+{
+    <Alerta Mensagem="Ainda não existe tarefas..." />
+    @* <p>Ainda não existe tarefas...</p>*@
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ação</th>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Concluída?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in tarefas)
+            {
+                <tr>
+                    <td><button @onclick="@(()=>RemoverTarefa(item.Id))" class="btn btn-danger oi oi-trash"></button></td>
+                    <th>@item.DataCriacao</th>
+                    <th>@item.Descricao</th>
+                    <th><input type="checkbox" @bind="item.Concluida" />@item.Concluida</th>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+
+@if (tarefas is not null)
+{
+    <div class="form-group">
+        <label>Nova Tarefa</label>
+        <input type="text" placeholder="informe a tarefa" @bind="novaTarefa" />
+        <button class="btn-primary" @onclick="AdicionarNovaTarefa">Adicionar tarefa</button>
+    </div>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        tarefas = await http.GetFromJsonAsync<List<Tarefa>>("Dados/tarefas.json");
+    }
+
+    private string? novaTarefa = string.Empty;
+    private List<Tarefa>? tarefas = new List<Tarefa>();
+
+    void AdicionarNovaTarefa()
+    {
+        if (!string.IsNullOrWhiteSpace(novaTarefa))
+        {
+            tarefas!.Add(
+                new Tarefa
+                    {
+                        DataCriacao = DateTime.Now,
+                        Descricao = novaTarefa,
+                        Id = Guid.NewGuid()
+                    });
+            novaTarefa = "";
+        }
+    }
+
+    public void RemoverTarefa(Guid id)
+    {
+        tarefas.Remove(tarefas.First(x => x.Id == id));
+    }
+
+
+}
