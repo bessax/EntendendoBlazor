@@ -1,0 +1,8 @@
+﻿<th>@item.DataCriacao</th>
+<th>@item.Descricao</th>
+<th><input type="checkbox" @bind="item.Concluida" />@item.Concluida</th>
+
+@code {
+    [Parameter]
+    public Tarefa? item { get; set; }
+}

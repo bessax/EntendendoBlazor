@@ -1,14 +1,13 @@
-﻿@inject HttpClient http
+﻿<h1>@Titulo</h1>
 
 @if (tarefas == null)
 {
     <Alerta Mensagem="Carregando..." />
-    @*<p>Carregando as tarefas...</p>*@
 }
 else if (!tarefas.Any())
 {
     <Alerta Mensagem="Ainda não existe tarefas..." />
-    @* <p>Ainda não existe tarefas...</p>*@
+
 }
 else
 {
@@ -26,9 +25,7 @@ else
             {
                 <tr>
                     <td><button @onclick="@(()=>RemoverTarefa(item.Id))" class="btn btn-danger oi oi-trash"></button></td>
-                    <th>@item.DataCriacao</th>
-                    <th>@item.Descricao</th>
-                    <th><input type="checkbox" @bind="item.Concluida" />@item.Concluida</th>
+                    <TarefaIndividual item="item" />
                 </tr>
             }
         </tbody>
@@ -46,13 +43,14 @@ else
 }
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        tarefas = await http.GetFromJsonAsync<List<Tarefa>>("Dados/tarefas.json");
-    }
 
     private string? novaTarefa = string.Empty;
-    private List<Tarefa>? tarefas = new List<Tarefa>();
+
+    [Parameter]
+    public List<Tarefa>? tarefas { get; set; }
+
+    [Parameter]
+    public string? Titulo { get; set; }
 
     void AdicionarNovaTarefa()
     {
